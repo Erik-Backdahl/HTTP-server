@@ -5,8 +5,8 @@ using System.Net.Sockets;
 Console.WriteLine("Logs from your program will appear here!");
 
 // Uncomment this block to pass the first stage
-TcpListener server = new TcpListener(IPAddress.Any, 4221);
-server.Start();
-var socket = server.AcceptSocket(); // wait for client
-socket.Send(System.Text.Encoding.UTF8.GetBytes("HTTP/1.1 200 OK\r\n\r\n"));
+// TcpListener server = new TcpListener(IPAddress.Any, 4221);
+//server.Start();
+//var socket = server.AcceptSocket(); // wait for client
+//socket.Send(System.Text.Encoding.UTF8.GetBytes("HTTP/1.1 200 OK\r\n\r\n"));
 
