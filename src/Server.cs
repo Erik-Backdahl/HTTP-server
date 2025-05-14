@@ -1,7 +1,9 @@
 using System.Net;
+using System.Net.Mime;
 using System.Net.Sockets;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Xml.Schema;
 
 // You can use print statements as follows for debugging, they'll be visible when running tests.
 Console.WriteLine("Logs from your program will appear here!");
@@ -24,27 +26,43 @@ string[] requestLine = lines[0].Split(" ");
 
 string path = requestLine[1];
 
-bool isValidPath = false;
+string status;
 
-string response = "HTTP/1.1 200 OK\r\n\r\n";
-
-if(path.Contains(".html") || path == "/")
+if(validateStatus(path))
 {
-    isValidPath = true;
+    status = "HTTP/1.1 200 OK";
 }
-if(isValidPath){
-    response = "HTTP/1.1 200 OK\r\n\r\n";
-}
-else{
-    response = "HTTP/1.1 404 Not Found\r\n\r\n";
+else
+{
+    status = "HTTP/1.1 404 Not Found";
+    socket.Send(System.Text.Encoding.UTF8.GetBytes(status));
 }
 
-socket.Send(System.Text.Encoding.UTF8.GetBytes(response));
+if(requestLine[1].Contains("/echo/"))
+{
+    string content = requestLine[1].Substring(requestLine[1].IndexOf("/echo/"));
 
-//LOLOLOLOLOLOLOL1
-//LOLOLOLOLOLOLOL2
-//LOLOLOLOLOLOLOL3
-//LOLOLOLOLOLOLOL4
-//LOLOLOLOLOLOLOL5
-//LOLOLOLOLOLOLOL6
-//LOLOLOLOLOLOLOL7
+    int contentLength = content.Length;
+
+    string result = $"{status}\r\nContent-Type: text/plain\r\nContent-Length: {contentLength}\r\n\r\n{content}";
+}
+
+
+
+
+
+
+socket.Send(System.Text.Encoding.UTF8.GetBytes(status));
+
+
+bool validateStatus(string URL)
+{
+    if (URL.Contains(".html") || URL == "/")
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
