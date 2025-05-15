@@ -4,65 +4,72 @@ using System.Net.Sockets;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Xml.Schema;
+using System;
+using System.Threading.Tasks;
+using System.Reflection;
 
-// You can use print statements as follows for debugging, they'll be visible when running tests.
-Console.WriteLine("Logs from your program will appear here!");
-
-// Uncomment this block to pass the first stage
-TcpListener server = new TcpListener(IPAddress.Any, 4221);
-server.Start();
-
-var socket = server.AcceptSocket(); // wait for client
-
-byte[] buffer = new byte[4096];
-
-int received = socket.Receive(buffer, SocketFlags.None);
-
-string requestString = Encoding.UTF8.GetString(buffer, 0, received);
-
-string[] lines = requestString.Split("\r\n");
-
-string[] requestLine = lines[0].Split(" ");
-
-string path = requestLine[1];
-
-string status;
-
-if(validateStatus(path))
+namespace Application
 {
-    status = "HTTP/1.1 200 OK";
-}
-else
-{
-    status = "HTTP/1.1 404 Not Found";
-    socket.Send(System.Text.Encoding.UTF8.GetBytes(status));
-}
-
-if(requestLine[1].Contains("/echo/"))
-{
-    string content = requestLine[1].Substring(requestLine[1].IndexOf("/echo/"));
-
-    int contentLength = content.Length;
-
-    string result = $"{status}\r\nContent-Type: text/plain\r\nContent-Length: {contentLength}\r\n\r\n{content}";
-}
-
-
-
-
-
-
-socket.Send(System.Text.Encoding.UTF8.GetBytes(status));
-
-
-bool validateStatus(string URL)
-{
-    if (URL.Contains(".html") || URL == "/")
+    class Program
     {
-        return true;
-    }
-    else
-    {
-        return false;
+        static async Task Main(string[] args)
+        {
+            Console.WriteLine("Hello World!");
+
+            var address = IPAddress.Parse("127.0.0.1");
+            TcpListener server = new TcpListener(address, 4221);
+            server.Start();
+
+            CancellationTokenSource cancellationToken = new CancellationTokenSource();
+
+
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                var tcpclient = await server.AcceptTcpClientAsync();
+                await handleRequest(tcpclient);
+                //await sendResponse(tcpclient);
+            }
+
+
+            Console.WriteLine("lol");
+        }
+
+        static async Task handleRequest(TcpClient client)
+        {
+            await using NetworkStream ns = client.GetStream();
+
+            var message = $"time {DateTime.Now}";
+
+
+            var responseTemplate = formatResponse(message);
+
+            var responseBytes = Encoding.UTF8.GetBytes(responseTemplate);
+            await ns.WriteAsync(responseBytes, 0, responseBytes.Length);
+
+
+            string secondMessage = "number 2";
+
+            responseTemplate = formatResponse(secondMessage);
+            responseBytes = Encoding.UTF8.GetBytes(responseTemplate);
+            await ns.WriteAsync(responseBytes, 0, responseBytes.Length);
+
+            await ns.FlushAsync();
+        }
+        static string formatResponse(string response)
+        {
+            var responseTemplate = $"HTTP/1.1 200 OK\r\n" +
+            $"Content-Type: text/plain\r\n" +
+            $"Content-Length: {response.Length}\r\n" +
+            $"\r\n" +
+            $"{response}";
+
+            return responseTemplate;
+
+        }
+        /*
+        static async Task sendResponse(TcpClient client)
+        {
+            
+        }*/
     }
 }
