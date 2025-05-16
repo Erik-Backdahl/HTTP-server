@@ -45,8 +45,6 @@ namespace Application
 
             // Example: "GET /path HTTP/1.1"
             string[] requestParts = requestLine.Split(' ');
-            string requestType = requestParts[0];
-            string path = requestParts[1];
 
             //Bad request
             if (requestParts.Length < 2)
@@ -58,6 +56,9 @@ namespace Application
                 // Malformed request, return early or handle as needed
                 return;
             }
+            string requestType = requestParts[0];
+            string path = requestParts[1];
+
             var message = LookForEndPoint(path);
             string responseTemplate;
             if (message == "Path Not Found")
@@ -68,12 +69,17 @@ namespace Application
             {
                 responseTemplate = formatResponse(message);
             }
-                
-            
+            if (message == "")
+            {
+                responseTemplate = "HTTP/1.1 200 OK\r\n\r\n";
+            }
+
+
 
 
             var responseBytes = Encoding.UTF8.GetBytes(responseTemplate);
             await networkStream.WriteAsync(responseBytes, 0, responseBytes.Length);
+            client.Close();
         }
 
         private static string LookForEndPoint(string path)
@@ -82,6 +88,8 @@ namespace Application
             {
                 case var p when p.StartsWith("/echo"):
                     return EndPointEcho(path);
+                case "/":
+                    return "";
                 default:
                     return "Path Not Found";
             }
@@ -104,9 +112,7 @@ namespace Application
             else
                 responseCode = "HTTP/1.1 404 Not Found";
 
-
-
-            var responseTemplate = $"{responseCode}\r\n" +
+            string responseTemplate = $"{responseCode}\r\n" +
             $"Content-Type: text/plain\r\n" +
             $"Content-Length: {response.Length}\r\n" +
             $"\r\n" +
