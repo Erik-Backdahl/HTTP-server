@@ -39,7 +39,6 @@ namespace Application
             string? requestLine = await reader.ReadLineAsync();
             if (string.IsNullOrEmpty(requestLine))
             {
-                // Malformed request, return early or handle as needed
                 return;
             }
 
@@ -59,10 +58,25 @@ namespace Application
                 await networkStream.WriteAsync(failedBytes, 0, failedBytes.Length);
                 return;
             }
+
+            var headers = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            string? headerLine;
+
+            while (!string.IsNullOrEmpty(headerLine = await reader.ReadLineAsync()))
+            {
+                int separatorIndex = headerLine.IndexOf(':');
+                if (separatorIndex > 0)
+                {
+                    string key = headerLine.Substring(0, separatorIndex).Trim();
+                    string value = headerLine.Substring(separatorIndex + 1).Trim();
+                    headers[key] = value;
+                }
+            }
+
             string requestType = requestParts[0];
             string path = requestParts[1];
 
-            var message = LookForEndPoint(path);
+            var message = LookForEndPoint(path, headers);
             string responseTemplate;
             if (message == "Path Not Found")
             {
@@ -82,14 +96,14 @@ namespace Application
             client.Close();
         }
 
-        private static string LookForEndPoint(string path)
+        private static string LookForEndPoint(string path,Dictionary<string,string> headers)
         {
             switch (path)
             {
                 case var p when p.StartsWith("/echo"):
                     return EndPointEcho(path);
                 case var p when p.StartsWith("/user-agent"):
-                    return EndPointUserAgent(path);
+                    return EndPointUserAgent(path, headers);
                 case "/": //Ignore
                     return "";
                 default:
@@ -97,9 +111,10 @@ namespace Application
             }
         }
 
-        private static string EndPointUserAgent(string path)
+        private static string EndPointUserAgent(string path, Dictionary<string, string> headers)
         {
-            
+            var message = headers.ContainsKey("user-agent") ? headers["User-Agent"] : "Path Not Found";
+            return message;
         }
 
         private static string EndPointEcho(string path)
