@@ -44,6 +44,10 @@ namespace Application
             }
 
             // Example: "GET /path HTTP/1.1"
+            // requestParts[0] request Type eg: "GET, POST, NOT FOUND" 
+            // requestParts[1] request Path eg: "/echo, /user-agent"
+            // requestParts[2] request http version: "HTTP/1.1"
+
             string[] requestParts = requestLine.Split(' ');
 
             //Bad request
@@ -53,7 +57,6 @@ namespace Application
                 var failedBytes = Encoding.UTF8.GetBytes(failed);
 
                 await networkStream.WriteAsync(failedBytes, 0, failedBytes.Length);
-                // Malformed request, return early or handle as needed
                 return;
             }
             string requestType = requestParts[0];
@@ -65,18 +68,15 @@ namespace Application
             {
                 responseTemplate = formatResponse(message, "404");
             }
+            else if (message == "")//Ignore
+            {
+                responseTemplate = "HTTP/1.1 200 OK\r\n\r\n";
+            }
             else
             {
                 responseTemplate = formatResponse(message);
             }
-            if (message == "")
-            {
-                responseTemplate = "HTTP/1.1 200 OK\r\n\r\n";
-            }
-
-
-
-
+            
             var responseBytes = Encoding.UTF8.GetBytes(responseTemplate);
             await networkStream.WriteAsync(responseBytes, 0, responseBytes.Length);
             client.Close();
@@ -88,11 +88,18 @@ namespace Application
             {
                 case var p when p.StartsWith("/echo"):
                     return EndPointEcho(path);
-                case "/":
+                case var p when p.StartsWith("/user-agent"):
+                    return EndPointUserAgent(path);
+                case "/": //Ignore
                     return "";
                 default:
                     return "Path Not Found";
             }
+        }
+
+        private static string EndPointUserAgent(string path)
+        {
+            
         }
 
         private static string EndPointEcho(string path)
