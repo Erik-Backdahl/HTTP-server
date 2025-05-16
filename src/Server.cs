@@ -48,40 +48,56 @@ namespace Application
             string requestType = requestParts[0];
             string path = requestParts[1];
 
+            //Bad request
             if (requestParts.Length < 2)
             {
-                var failed = formatResponse("", "400");
+                var failed = formatResponse("Request is malformed", "400");
                 var failedBytes = Encoding.UTF8.GetBytes(failed);
 
                 await networkStream.WriteAsync(failedBytes, 0, failedBytes.Length);
                 // Malformed request, return early or handle as needed
                 return;
             }
-            LookForEndPoint(path);
+            var message = LookForEndPoint(path);
+            string responseTemplate;
+            if (message == "Path Not Found")
+            {
+                responseTemplate = formatResponse(message, "404");
+            }
+            else
+            {
+                responseTemplate = formatResponse(message);
+            }
+                
+            
 
-            //DeterminePath of Request
-
-
-
-
-
-
-
-
-            //Default Response
-            var message = $"time {DateTime.Now}";
-
-            var responseTemplate = formatResponse("Default " + message);
 
             var responseBytes = Encoding.UTF8.GetBytes(responseTemplate);
             await networkStream.WriteAsync(responseBytes, 0, responseBytes.Length);
+        }
+
+        private static string LookForEndPoint(string path)
+        {
+            switch (path)
+            {
+                case var p when p.StartsWith("/echo"):
+                    return EndPointEcho(path);
+                default:
+                    return "Path Not Found";
+            }
+        }
+
+        private static string EndPointEcho(string path)
+        {
+            string message = path.Substring(path.LastIndexOf("/") + 1);
+            return message;
         }
 
         static string formatResponse(string response = "", string requestType = "200")
         {
             string responseCode;
 
-            if  (requestType == "200")
+            if (requestType == "200")
                 responseCode = "HTTP/1.1 200 OK";
             else if (requestType == "400")
                 responseCode = "HTTP/1.1 400 Bad Request";
