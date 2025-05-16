@@ -26,7 +26,7 @@ namespace Application
             while (!cancellationToken.IsCancellationRequested)
             {
                 var tcpclient = await server.AcceptTcpClientAsync();
-                await handleRequest(tcpclient);
+                await Task.Run(() => handleRequest(tcpclient));
                 //await sendResponse(tcpclient);
             }
         }
@@ -93,8 +93,7 @@ namespace Application
             
             var responseBytes = Encoding.UTF8.GetBytes(responseTemplate);
             await networkStream.WriteAsync(responseBytes, 0, responseBytes.Length);
-            
-            client.Close();
+        
         }
 
         private static string LookForEndPoint(string path,Dictionary<string,string> headers)
