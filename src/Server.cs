@@ -93,6 +93,7 @@ namespace Application
             
             var responseBytes = Encoding.UTF8.GetBytes(responseTemplate);
             await networkStream.WriteAsync(responseBytes, 0, responseBytes.Length);
+            
             client.Close();
         }
 
