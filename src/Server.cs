@@ -26,8 +26,7 @@ namespace Application
             while (!cancellationToken.IsCancellationRequested)
             {
                 var tcpclient = await server.AcceptTcpClientAsync();
-                await Task.Run(() => handleRequest(tcpclient));
-                //await sendResponse(tcpclient);
+                _ = Task.Run(() => handleRequest(tcpclient));
             }
         }
 
