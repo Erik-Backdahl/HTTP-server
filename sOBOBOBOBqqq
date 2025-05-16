@@ -1,0 +1,77 @@
+[33mcommit ace7d6c9aea6edc3eb26ecc62ea769153bd8638d[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmaster[m[33m)[m
+Author: Erik Bäckdahl <erik.backdahl@gmail.com>
+Date:   Thu May 15 18:12:48 2025 +0200
+
+    reworked everything
+
+[33mcommit 4beb78ff35315d7a16fab1734af7cff0fdc94b98[m[33m ([m[1;31mmaster/master[m[33m, [m[1;31mmaster/HEAD[m[33m)[m
+Author: Erik Bäckdahl <erik.backdahl@gmail.com>
+Date:   Wed May 14 18:02:38 2025 +0200
+
+    added test end points/echo
+
+[33mcommit 4c0e1a61aa84e46d5d6dce0dffb374735dcb98bb[m
+Author: Erik Bäckdahl <erik.backdahl@gmail.com>
+Date:   Wed May 14 17:19:21 2025 +0200
+
+    [any message]
+
+[33mcommit 68a4599ccf64494404c53045d7ca14246e518289[m
+Author: Erik Bäckdahl <erik.backdahl@gmail.com>
+Date:   Tue May 13 22:28:34 2025 +0200
+
+    [any message]
+
+[33mcommit 5d5e3824c9f5cb4ea722b5b5a819b913c02d4092[m
+Author: Erik Bäckdahl <erik.backdahl@gmail.com>
+Date:   Tue May 13 14:40:04 2025 +0200
+
+    200 and 404
+
+[33mcommit 173a7242076d8fc2c8777faf573d405a5ab4d69c[m
+Author: Erik Bäckdahl <erik.backdahl@gmail.com>
+Date:   Tue May 13 11:49:17 2025 +0200
+
+    [any message]
+
+[33mcommit fa5b5b1b140c24bc92394f3b4e44635a6c68e795[m
+Author: Erik Bäckdahl <erik.backdahl@gmail.com>
+Date:   Tue May 13 11:49:09 2025 +0200
+
+    [any message]
+
+[33mcommit 37ad4bb94b3bc9d49edfa2e0422718b6c781ccc2[m
+Author: Erik Bäckdahl <erik.backdahl@gmail.com>
+Date:   Tue May 13 11:46:20 2025 +0200
+
+    test
+
+[33mcommit bde82f0f4346ff8e18347959c96814b8b34c8b1d[m
+Author: Erik Bäckdahl <erik.backdahl@gmail.com>
+Date:   Mon Apr 14 18:14:35 2025 +0200
+
+    [any message]
+
+[33mcommit b47bbb9b746c41129afe565186f12f508790b0d2[m
+Author: Erik Bäckdahl <erik.backdahl@gmail.com>
+Date:   Mon Apr 14 18:12:02 2025 +0200
+
+    [any message]
+
+[33mcommit e4664f75e4e891d12f958825dd06c87fc9a0d636[m
+Author: Erik Bäckdahl <erik.backdahl@gmail.com>
+Date:   Mon Apr 14 18:11:47 2025 +0200
+
+    [any message]
+
+[33mcommit 25f051cc7e1c46ca24f9bd64e43b8b5c2b70f872[m
+Author: Erik Bäckdahl <erik.backdahl@gmail.com>
+Date:   Mon Apr 14 18:07:58 2025 +0200
+
+    test
+
+[33mcommit f06e70976e151cb226d7f8f6b17f6e2ceff4b04c[m
+Author: codecrafters-bot <hello@codecrafters.io>
+Date:   Mon Apr 14 14:05:11 2025 +0000
+
+    init [skip ci]
