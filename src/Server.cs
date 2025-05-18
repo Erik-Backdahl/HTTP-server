@@ -101,15 +101,13 @@ namespace Application
 
         private static string EndPointFiles(string path, Dictionary<string, string> headers)
         {
-            string directory = @"C:\Users\Erik\VSC\PROJECTS\HTTPSERVER\codecrafters-http-server-csharp";
+            // Remove "/files/" from the path to get the filename
+            string filename = path.Substring("/files/".Length);
+            string filePath = Path.Combine(@"C:\tmp", filename); // For Windows
 
-            var pathParts = path.Split('/', StringSplitOptions.RemoveEmptyEntries);
-
-            var filePath = Path.Combine(directory, Path.Combine(pathParts));
-
-            if (File.Exists(filePath + ".txt"))
+            if (File.Exists(filePath))
             {
-                string content = File.ReadAllText(filePath + ".txt");
+                string content = File.ReadAllText(filePath);
                 return formatResponse("200", "application/octet-stream", content);
             }
             else
