@@ -90,11 +90,31 @@ namespace Application
                     return EndPointEcho(path);
                 case var p when p.StartsWith("/user-agent"):
                     return EndPointUserAgent(path, headers);
+                case var p when p.StartsWith("/files"):
+                    return EndPointFiles(path, headers);
                 case "/": //Ignore
                     return "";
                 default:
                     return "Path Not Found";
             }
+        }
+
+        private static string EndPointFiles(string path, Dictionary<string, string> headers)
+        {
+            //ONLY WORKS FOR .txt FILES in \files FOLDER TODO: CHECK FOR FILE TYPE AND OTHER FOLDERS mebe
+            string filename = path.Substring("/files".Length);
+
+            if (File.Exists($@"C:\Users\Erik\VSC\PROJECTS\HTTPSERVER\codecrafters-http-server-csharp\files\{filename}.txt"))
+            {
+                string content = File.ReadAllText($@"C:\Users\Erik\VSC\PROJECTS\HTTPSERVER\codecrafters-http-server-csharp\files\{filename}.txt");
+                return formatResponse("200", "application/octet-stream", content);
+            }
+            else
+            {
+                //NOT FOUND
+                return FormatEasyResponse("404");
+            }
+            
         }
 
         private static string EndPointUserAgent(string path, Dictionary<string, string> headers)
