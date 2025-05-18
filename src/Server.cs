@@ -76,7 +76,7 @@ namespace Application
             string path = requestParts[1];
 
             var responseTemplate = LookForEndPoint(path, headers);
-
+            
             var responseBytes = Encoding.UTF8.GetBytes(responseTemplate);
             await networkStream.WriteAsync(responseBytes, 0, responseBytes.Length);
 
@@ -101,28 +101,22 @@ namespace Application
 
         private static string EndPointFiles(string path, Dictionary<string, string> headers)
         {
-            var pathParts = path.Split("/");
+            string directory = @"C:\Users\Erik\VSC\PROJECTS\HTTPSERVER\codecrafters-http-server-csharp";
 
-            string fileFind = "";
+            var pathParts = path.Split('/', StringSplitOptions.RemoveEmptyEntries);
 
-            for (int i = 1; i < pathParts.Length; i++)
+            var filePath = Path.Combine(directory, Path.Combine(pathParts));
+
+            if (File.Exists(filePath + ".txt"))
             {
-                fileFind += pathParts[i];
-            }
-
-
-            var filePath = Path.Combine(@"C:\Users\Erik\VSC\PROJECTS\HTTPSERVER\codecrafters-http-server-csharp", fileFind, ".txt");
-
-            if (File.Exists(filePath))
-            {
-                string content = File.ReadAllText(filePath);
+                string content = File.ReadAllText(filePath + ".txt");
                 return formatResponse("200", "application/octet-stream", content);
             }
             else
             {
                 return FormatEasyResponse("404");
             }
-
+            
         }
 
         private static string EndPointUserAgent(string path, Dictionary<string, string> headers)
