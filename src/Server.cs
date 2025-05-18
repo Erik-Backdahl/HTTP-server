@@ -76,7 +76,7 @@ namespace Application
             string path = requestParts[1];
 
             var responseTemplate = LookForEndPoint(path, headers);
-            
+
             var responseBytes = Encoding.UTF8.GetBytes(responseTemplate);
             await networkStream.WriteAsync(responseBytes, 0, responseBytes.Length);
 
@@ -101,20 +101,20 @@ namespace Application
 
         private static string EndPointFiles(string path, Dictionary<string, string> headers)
         {
-            //ONLY WORKS FOR .txt FILES in \files FOLDER TODO: CHECK FOR FILE TYPE AND OTHER FOLDERS mebe
-            string filename = path.Substring("/files".Length);
+            var pathParts = path.Split("/");
 
-            if (File.Exists($@"C:\Users\Erik\VSC\PROJECTS\HTTPSERVER\codecrafters-http-server-csharp\files\{filename}.txt"))
+            var filePath = Path.Combine(@"C:\Users\Erik\VSC\PROJECTS\HTTPSERVER\codecrafters-http-server-csharp", pathParts[1], pathParts[2]) + ".txt";
+
+            if (File.Exists(filePath))
             {
-                string content = File.ReadAllText($@"C:\Users\Erik\VSC\PROJECTS\HTTPSERVER\codecrafters-http-server-csharp\files\{filename}.txt");
+                string content = File.ReadAllText(filePath);
                 return formatResponse("200", "application/octet-stream", content);
             }
             else
             {
-                //NOT FOUND
                 return FormatEasyResponse("404");
             }
-            
+
         }
 
         private static string EndPointUserAgent(string path, Dictionary<string, string> headers)
