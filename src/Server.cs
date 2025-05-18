@@ -51,10 +51,10 @@ namespace Application
             //Bad request
             if (requestParts.Length < 2)
             {
-                var failed = formatResponse("Request is malformed", "400");
+                var failed = FormatEasyResponse("400");
                 var failedBytes = Encoding.UTF8.GetBytes(failed);
-
                 await networkStream.WriteAsync(failedBytes, 0, failedBytes.Length);
+
                 return;
             }
 
@@ -75,27 +75,14 @@ namespace Application
             string requestType = requestParts[0];
             string path = requestParts[1];
 
-            var message = LookForEndPoint(path, headers);
-            string responseTemplate;
-            if (message == "Path Not Found")
-            {
-                responseTemplate = formatResponse(message, "404");
-            }
-            else if (message == "")//Ignore
-            {
-                responseTemplate = "HTTP/1.1 200 OK\r\n\r\n";
-            }
-            else
-            {
-                responseTemplate = formatResponse(message);
-            }
+            var responseTemplate = LookForEndPoint(path, headers);
             
             var responseBytes = Encoding.UTF8.GetBytes(responseTemplate);
             await networkStream.WriteAsync(responseBytes, 0, responseBytes.Length);
-        
+
         }
 
-        private static string LookForEndPoint(string path,Dictionary<string,string> headers)
+        private static string LookForEndPoint(string path, Dictionary<string, string> headers)
         {
             switch (path)
             {
@@ -113,34 +100,65 @@ namespace Application
         private static string EndPointUserAgent(string path, Dictionary<string, string> headers)
         {
             var message = headers.ContainsKey("user-agent") ? headers["User-Agent"] : "Path Not Found";
-            return message;
+            return formatResponse("200", "text/plain", message);
         }
 
         private static string EndPointEcho(string path)
         {
             string message = path.Substring(path.LastIndexOf("/") + 1);
-            return message;
+            return formatResponse("200", "text/plain", message);
         }
 
-        static string formatResponse(string response = "", string requestType = "200")
+
+        static string formatCodeOperation(string requestOperation)
         {
             string responseCode;
 
-            if (requestType == "200")
-                responseCode = "HTTP/1.1 200 OK";
-            else if (requestType == "400")
-                responseCode = "HTTP/1.1 400 Bad Request";
+            if (requestOperation == "200")
+                responseCode = "HTTP/1.1 200 OK\r\n";
+            else if (requestOperation == "400")
+                responseCode = "HTTP/1.1 400 Bad Request\r\n";
             else
-                responseCode = "HTTP/1.1 404 Not Found";
+                responseCode = "HTTP/1.1 404 Not Found\r\n";
 
-            string responseTemplate = $"{responseCode}\r\n" +
-            $"Content-Type: text/plain\r\n" +
-            $"Content-Length: {response.Length}\r\n" +
-            $"\r\n" +
-            $"{response}";
+            return responseCode;
+        }
+        static string formatContentType(string contentType)
+        {
+            string responseContentType;
+            if (contentType == "text/plain")
+                responseContentType = "Content-Type: text/plain\r\n";
+            else
+                responseContentType = "Content-Type: application/octet-stream\r\n";
+
+            return responseContentType;
+        }
+        static string formatResponse(string requestOperation, string requestContentType, string message)
+        {
+            string responseCode = formatCodeOperation(requestOperation);
+            string responseContentType = formatContentType(requestContentType);
+
+            string responseTemplate =
+            $"{responseCode}" +
+            $"{responseContentType}" +
+            $"Content-Length: {message.Length}\r\n\r\n" +
+            $"{message}";
 
             return responseTemplate;
 
+        }
+        static string FormatEasyResponse(string requestOperation)
+        {
+            string responseCode;
+
+            if (requestOperation == "200")
+                responseCode = "HTTP/1.1 200 OK\r\n";
+            else if (requestOperation == "400")
+                responseCode = "HTTP/1.1 400 Bad Request\r\n";
+            else
+                responseCode = "HTTP/1.1 404 Not Found\r\n";
+
+            return responseCode;
         }
     }
 }
