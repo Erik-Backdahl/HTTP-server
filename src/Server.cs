@@ -101,9 +101,12 @@ namespace Application
 
         private static string EndPointFiles(string path, Dictionary<string, string> headers)
         {
-            // Remove "/files/" from the path to get the filename
-            string filename = path.Substring("/files/".Length);
-            string filePath = Path.Combine(@"C:\tmp", filename); // For Windows
+            // Remove "/files/" from the path to get the relative file path
+            string relativePath = path.Substring("/files/".Length);
+            // Combine with base directory, preserving any subdirectories, and get absolute path
+            string baseDirectory = @"C:\tmp";
+            string combinedPath = Path.Combine(baseDirectory, relativePath);
+            string filePath = Path.GetFullPath(combinedPath);
 
             if (File.Exists(filePath))
             {
