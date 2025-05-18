@@ -172,11 +172,11 @@ namespace Application
             string responseCode;
 
             if (requestOperation == "200")
-                responseCode = "HTTP/1.1 200 OK\r\n";
+                responseCode = "HTTP/1.1 200 OK\r\n\r\n";
             else if (requestOperation == "400")
-                responseCode = "HTTP/1.1 400 Bad Request\r\n";
+                responseCode = "HTTP/1.1 400 Bad Request\r\n\r\n";
             else
-                responseCode = "HTTP/1.1 404 Not Found\r\n";
+                responseCode = "HTTP/1.1 404 Not Found\r\n\r\n";
 
             return responseCode;
         }
