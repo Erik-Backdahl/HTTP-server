@@ -103,7 +103,15 @@ namespace Application
         {
             var pathParts = path.Split("/");
 
-            var filePath = Path.Combine(@"C:\Users\Erik\VSC\PROJECTS\HTTPSERVER\codecrafters-http-server-csharp", pathParts[1], pathParts[2]) + ".txt";
+            string fileFind = "";
+
+            for (int i = 1; i < pathParts.Length; i++)
+            {
+                fileFind += pathParts[i];
+            }
+
+
+            var filePath = Path.Combine(@"C:\Users\Erik\VSC\PROJECTS\HTTPSERVER\codecrafters-http-server-csharp", fileFind, ".txt");
 
             if (File.Exists(filePath))
             {
