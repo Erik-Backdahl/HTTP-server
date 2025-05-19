@@ -102,10 +102,11 @@ namespace Application
         private static string EndPointFiles(string path, Dictionary<string, string> headers)
         {
             // Remove "/files/" from the path to get the relative file path
-            string relativePath = path.Substring("/files/".Length);
-            // Combine with base directory, preserving any subdirectories, and get absolute path
-            string baseDirectory = @"C:\tmp";
-            string combinedPath = Path.Combine(baseDirectory, relativePath);
+            string relativePath = path.StartsWith("/files/") ? path["/files/".Length..] : "";
+            // Remove any leading slashes that may remain
+            relativePath = relativePath.TrimStart('/');
+            string baseDirectory = @"C:\Users\Erik\AppData\Local\Temp";
+            string combinedPath = Path.Combine(baseDirectory, relativePath + ".txt");
             string filePath = Path.GetFullPath(combinedPath);
 
             if (File.Exists(filePath))
@@ -115,6 +116,7 @@ namespace Application
             }
             else
             {
+                Console.WriteLine($"file {relativePath} does not exist");
                 return FormatEasyResponse("404");
             }
             
