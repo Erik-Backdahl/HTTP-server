@@ -105,7 +105,7 @@ namespace Application
             string relativePath = path.StartsWith("/files/") ? path["/files/".Length..] : "";
             // Remove any leading slashes that may remain
             relativePath = relativePath.TrimStart('/');
-            string baseDirectory = @"C:\Users\Erik\AppData\Local\Temp";
+            string baseDirectory = @"c:\Users\Erik\AppData\Local\Temp\";
             string combinedPath = Path.Combine(baseDirectory, relativePath + ".txt");
             string filePath = Path.GetFullPath(combinedPath);
 
