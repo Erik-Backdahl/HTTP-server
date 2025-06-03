@@ -93,9 +93,9 @@ namespace Application
                 case var p when p.StartsWith("/files"):
                     return EndPointFiles(path, headers);
                 case "/": //Ignore
-                    return "";
+                    return FormatEasyResponse("200");
                 default:
-                    return "Path Not Found";
+                    return FormatEasyResponse("400");
             }
         }
 
