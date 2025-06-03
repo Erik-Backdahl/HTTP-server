@@ -95,7 +95,7 @@ namespace Application
                 case "/": //Ignore
                     return FormatEasyResponse("200");
                 default:
-                    return FormatEasyResponse("400");
+                    return FormatEasyResponse("404");
             }
         }
 
