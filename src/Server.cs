@@ -105,10 +105,9 @@ namespace Application
             string relativePath = path.StartsWith("/files/") ? path["/files/".Length..] : "";
             // Remove any leading slashes that may remain
             relativePath = relativePath.TrimStart('/');
-            
+
             string baseDirectory = @"/tmp/data/codecrafters.io/http-server-tester";
-            string combinedPath = Path.Combine(baseDirectory, relativePath + ".txt");
-            string filePath = Path.GetFullPath(combinedPath);
+            string filePath = Path.Combine(baseDirectory, relativePath);
 
             if (File.Exists(filePath))
             {
