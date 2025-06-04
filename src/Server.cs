@@ -75,14 +75,24 @@ namespace Application
             string requestType = requestParts[0];
             string path = requestParts[1];
 
-            var responseTemplate = LookForEndPoint(path, headers);
-            
+            // Read body if POST
+            string? body = null;
+            if (requestType == "POST" && headers.ContainsKey("Content-Length"))
+            {
+                int contentLength = int.Parse(headers["Content-Length"]);
+                char[] buffer = new char[contentLength];
+                int read = await reader.ReadAsync(buffer, 0, contentLength);
+                body = new string(buffer, 0, read);
+            }
+
+            var responseTemplate = LookForEndPoint(path, headers, requestType, body);
+
             var responseBytes = Encoding.UTF8.GetBytes(responseTemplate);
             await networkStream.WriteAsync(responseBytes, 0, responseBytes.Length);
 
         }
 
-        private static string LookForEndPoint(string path, Dictionary<string, string> headers)
+        private static string LookForEndPoint(string path, Dictionary<string, string> headers, string requestType, string? body)
         {
             switch (path)
             {
@@ -91,7 +101,12 @@ namespace Application
                 case var p when p.StartsWith("/user-agent"):
                     return EndPointUserAgent(path, headers);
                 case var p when p.StartsWith("/files"):
-                    return EndPointFiles(path, headers);
+                    {
+                        if (requestType == "POST")
+                            return EndPointPostFiles(path, headers, body);
+
+                        return EndPointFiles(path, headers);
+                    }
                 case "/": //Ignore
                     return FormatEasyResponse("200");
                 default:
@@ -99,11 +114,24 @@ namespace Application
             }
         }
 
+        private static string EndPointPostFiles(string path, Dictionary<string, string> headers, string? body)
+        {
+            string relativePath = path.StartsWith("/files/") ? path["/files/".Length..] : "";
+            relativePath = relativePath.TrimStart('/');
+
+            string baseDirectory = @"/tmp/data/codecrafters.io/http-server-tester";
+            string filePath = Path.Combine(baseDirectory, relativePath);
+
+            Directory.CreateDirectory(baseDirectory);
+
+            File.WriteAllText(filePath, body ?? "");
+
+            return FormatEasyResponse("201");
+        }
+
         private static string EndPointFiles(string path, Dictionary<string, string> headers)
         {
-            // Remove "/files/" from the path to get the relative file path
             string relativePath = path.StartsWith("/files/") ? path["/files/".Length..] : "";
-            // Remove any leading slashes that may remain
             relativePath = relativePath.TrimStart('/');
 
             string baseDirectory = @"/tmp/data/codecrafters.io/http-server-tester";
@@ -117,24 +145,19 @@ namespace Application
             else
             {
                 Console.WriteLine($"file {relativePath} does not exist");
-                return FormatEasyResponse("404");
+                return formatResponse("404", "text/plain", $"\"{relativePath}\" does not exist");
             }
-            
         }
-
         private static string EndPointUserAgent(string path, Dictionary<string, string> headers)
         {
             var message = headers.ContainsKey("user-agent") ? headers["User-Agent"] : "Path Not Found";
             return formatResponse("200", "text/plain", message);
         }
-
         private static string EndPointEcho(string path)
         {
             string message = path.Substring(path.LastIndexOf("/") + 1);
             return formatResponse("200", "text/plain", message);
         }
-
-
         static string formatCodeOperation(string requestOperation)
         {
             string responseCode;
@@ -178,6 +201,8 @@ namespace Application
 
             if (requestOperation == "200")
                 responseCode = "HTTP/1.1 200 OK\r\n\r\n";
+            else if (requestOperation == "201")
+                responseCode = "HTTP/1.1 201 Created\r\n\r\n";
             else if (requestOperation == "400")
                 responseCode = "HTTP/1.1 400 Bad Request\r\n\r\n";
             else
